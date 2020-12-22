@@ -85,7 +85,7 @@ const renderMessages = (userId, messages) => {
 };
 
 export function MessageList(props) {
-  const { userId, messages, isShowJoinButton, handleSendMessage, handleSubscribeRoom } = props;
+  const { userId, messages, isShowJoinButton, handleSendMessage, handleSubscribeGroup } = props;
   const classes = useStyles();
 
   return (
@@ -102,7 +102,7 @@ export function MessageList(props) {
         {renderMessages(userId, messages)}
       </ScrollToBottom>
       {isShowJoinButton && (
-        <Button variant="outlined" onClick={handleSubscribeRoom}>
+        <Button variant="outlined" onClick={handleSubscribeGroup}>
           Subscribe
         </Button>
       )}

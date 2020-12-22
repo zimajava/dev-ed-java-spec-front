@@ -34,14 +34,14 @@ export function ConversationList(props) {
     rooms,
     currentConversation,
     isCreateConversation,
-    handleChangeRoom,
-    handleCreateChannel,
+    handleChangeGroup,
+    handleCreateGroup,
   } = props;
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
-  const [channelName, setChannelName] = useState('');
-  const [channelDescription, setChannelDescription] = useState('');
+  const [channelName, setGroupName] = useState('');
+  const [channelDescription, setGroupDescription] = useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -77,7 +77,7 @@ export function ConversationList(props) {
             conversation={conversation}
             name={conversation.name}
             snippet={conversation.snippet}
-            handleChangeRoom={handleChangeRoom}
+            handleChangeGroup={handleChangeGroup}
           />
         ))}
       </div>
@@ -89,19 +89,19 @@ export function ConversationList(props) {
             autoFocus
             margin="dense"
             id="name"
-            label="Channel name"
+            label="Group name"
             type="text"
             fullWidth
-            onChange={(event) => setChannelName(event.target.value)}
+            onChange={(event) => setGroupName(event.target.value)}
           />
           <TextField
             autoFocus
             margin="dense"
             id="description"
-            label="Channel description"
+            label="Group description"
             type="text"
             fullWidth
-            onChange={(event) => setChannelDescription(event.target.value)}
+            onChange={(event) => setGroupDescription(event.target.value)}
           />
         </DialogContent>
         <DialogActions>
@@ -110,7 +110,7 @@ export function ConversationList(props) {
           </Button>
           <Button
             onClick={() => {
-              handleCreateChannel({ name: channelName, description: channelDescription });
+              handleCreateGroup({ name: channelName, description: channelDescription });
               handleClose();
             }}
             color="primary"

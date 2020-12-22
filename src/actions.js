@@ -1,42 +1,42 @@
 import axios from 'axios';
 import { API_BASE } from './config';
 
-export const CREATE_ROOM_REQUEST = 'CREATE_ROOM_REQUEST';
-export const CREATE_ROOM_SUCCESS = 'CREATE_ROOM_SUCCESS';
-export const CREATE_ROOM_ERROR = 'CREATE_ROOM_ERROR';
+export const CREATE_GROUP_REQUEST = 'CREATE_GROUP_REQUEST';
+export const CREATE_GROUP_SUCCESS = 'CREATE_GROUP_SUCCESS';
+export const CREATE_GROUP_ERROR = 'CREATE_GROUP_ERROR';
 
-export const createRoomRequest = () => ({ type: CREATE_ROOM_REQUEST });
-export const createRoomSuccess = (payload) => ({ type: CREATE_ROOM_SUCCESS, payload });
-export const createRoomError = (error) => ({ type: CREATE_ROOM_ERROR, error });
+export const createGroupRequest = () => ({ type: CREATE_GROUP_REQUEST });
+export const createGroupSuccess = (payload) => ({ type: CREATE_GROUP_SUCCESS, payload });
+export const createGroupError = (error) => ({ type: CREATE_GROUP_ERROR, error });
 
-export function createRoom(roomName) {
+export function createGroup(roomName) {
   return async function (dispatch) {
-    dispatch(createRoomRequest());
+    dispatch(createGroupRequest());
     try {
       const response = await axios.get(`${API_BASE}/room?name=${roomName}`);
-      dispatch(createRoomSuccess(response.data));
+      dispatch(createGroupSuccess(response.data));
     } catch (error) {
-      dispatch(createRoomError(error));
+      dispatch(createGroupError(error));
     }
   };
 }
 
-export const JOIN_ROOM_REQUEST = 'JOIN_ROOM_REQUEST';
-export const JOIN_ROOM_SUCCESS = 'JOIN_ROOM_SUCCESS';
-export const JOIN_ROOM_ERROR = 'JOIN_ROOM_ERROR';
+export const JOIN_GROUP_REQUEST = 'JOIN_GROUP_REQUEST';
+export const JOIN_GROUP_SUCCESS = 'JOIN_GROUP_SUCCESS';
+export const JOIN_GROUP_ERROR = 'JOIN_GROUP_ERROR';
 
-export const joinRoomRequest = () => ({ type: JOIN_ROOM_REQUEST });
-export const joinRoomSuccess = (payload) => ({ type: JOIN_ROOM_SUCCESS, payload });
-export const joinRoomError = (error) => ({ type: JOIN_ROOM_ERROR, error });
+export const joinGroupRequest = () => ({ type: JOIN_GROUP_REQUEST });
+export const joinGroupSuccess = (payload) => ({ type: JOIN_GROUP_SUCCESS, payload });
+export const joinGroupError = (error) => ({ type: JOIN_GROUP_ERROR, error });
 
-export function joinRoom(roomId) {
+export function joinGroup(roomId) {
   return async function (dispatch) {
-    dispatch(joinRoomRequest());
+    dispatch(joinGroupRequest());
     try {
       const response = await axios.get(`${API_BASE}/room/${roomId}`);
-      dispatch(joinRoomSuccess(response.data));
+      dispatch(joinGroupSuccess(response.data));
     } catch (error) {
-      dispatch(joinRoomError(error));
+      dispatch(joinGroupError(error));
     }
   };
 }

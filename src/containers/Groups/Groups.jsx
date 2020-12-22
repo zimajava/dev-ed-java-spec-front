@@ -2,19 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Toolbar, CircularProgress } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { selectRooms, selectCurrentUser, selectCurrentRoomMessages } from '../App/selectors';
+import { selectGroups, selectCurrentUser, selectCurrentGroupMessages } from '../App/selectors';
 import { Messenger } from '../../components';
 import { actionSocketMessageSend } from '../App/actions';
 import { SOCKET_COMMANDS } from '../App/constants';
 
-const { ROOM_JOIN, MESSAGE_ADD, CHANNEL_CREATE } = SOCKET_COMMANDS;
+const { GROUP_JOIN, MESSAGE_ADD, GROUP_CREATE } = SOCKET_COMMANDS;
 
-export const Channels = () => {
+export const Groups = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
 
-  const rooms = useSelector(selectRooms);
-  const messages = useSelector(selectCurrentRoomMessages);
+  const rooms = useSelector(selectGroups);
+  const messages = useSelector(selectCurrentGroupMessages);
 
   const [currentConversation, setCurrentConversation] = useState(null);
 
@@ -28,7 +28,7 @@ export const Channels = () => {
     if (currentConversation) {
       dispatch(
         actionSocketMessageSend({
-          event: ROOM_JOIN,
+          event: GROUP_JOIN,
           data: { roomId: currentConversation._id, userId: currentUser._id },
         }),
       );
@@ -48,11 +48,11 @@ export const Channels = () => {
     },
     [dispatch],
   );
-  const handleCreateChannel = useCallback(
+  const handleCreateGroup = useCallback(
     ({ name, description }) => {
       dispatch(
         actionSocketMessageSend({
-          event: CHANNEL_CREATE,
+          event: GROUP_CREATE,
           data: { name, description },
         }),
       );
@@ -65,16 +65,16 @@ export const Channels = () => {
       <Toolbar />
       {currentConversation ? (
         <Messenger
-          title="Channels"
+          title="Groups"
           isCreateConversation
           userId={currentUser._id}
           rooms={rooms}
           messages={messages}
           currentConversation={currentConversation}
           // isShowJoinButton={isShowJoinButton}
-          handleChangeRoom={setCurrentConversation}
+          handleChangeGroup={setCurrentConversation}
           handleSendMessage={handleSendMessage}
-          handleCreateChannel={handleCreateChannel}
+          handleCreateGroup={handleCreateGroup}
         />
       ) : (
         <CircularProgress />

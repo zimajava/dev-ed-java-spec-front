@@ -41,7 +41,8 @@ export const SignUp = () => {
 
   const dispatch = useDispatch();
 
-  const [username, setUserName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [nickName, setNickName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,7 +50,7 @@ export const SignUp = () => {
   const onFormSubmit = (event) => {
     event.preventDefault();
 
-    dispatch(actionUserRegisterRequest({ username, email, password, confirmPassword }));
+    dispatch(actionUserRegisterRequest({ userName, nickName, email, password, confirmPassword }));
   };
 
   return (
@@ -79,6 +80,19 @@ export const SignUp = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                autoComplete="nickname"
+                name="nickName"
+                variant="outlined"
+                required
+                fullWidth
+                id="nickName"
+                label="Nick Name"
+                autoFocus
+                onChange={(event) => setNickName(event.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
                 variant="outlined"
                 required
                 fullWidth
@@ -86,6 +100,7 @@ export const SignUp = () => {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                type="email"
                 onChange={(event) => setEmail(event.target.value)}
               />
             </Grid>

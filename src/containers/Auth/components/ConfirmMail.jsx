@@ -1,5 +1,10 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router';
 import { makeStyles, Button, CssBaseline, Typography, Container } from '@material-ui/core';
+import { parse } from 'query-string';
+
+import { actionConfirmMailRequest } from '../actions';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -23,9 +28,14 @@ const useStyles = makeStyles((theme) => ({
 
 export const ConfirmMail = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { search } = useLocation();
+
+  const { token } = parse(search);
 
   const onFormSubmit = (event) => {
     event.preventDefault();
+    dispatch(actionConfirmMailRequest({ token }));
   };
 
   return (

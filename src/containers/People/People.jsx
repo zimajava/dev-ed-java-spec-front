@@ -5,28 +5,28 @@ import { CircularProgress, Toolbar } from '@material-ui/core';
 import { Messenger } from '../../components';
 import {
   selectUsers,
-  selectRooms,
+  selectGroups,
   selectCurrentUser,
-  selectCurrentRoomMessages,
+  selectCurrentGroupMessages,
   selectOnlineUsers,
 } from '../App/selectors';
 import { actionSocketMessageSend } from '../App/actions';
 import { SOCKET_COMMANDS } from '../App/constants';
 
-const { ROOM_JOIN, MESSAGE_ADD } = SOCKET_COMMANDS;
+const { GROUP_JOIN, MESSAGE_ADD } = SOCKET_COMMANDS;
 
 export const People = () => {
   const dispatch = useDispatch();
 
   const currentUser = useSelector(selectCurrentUser);
   const users = useSelector(selectUsers);
-  const rooms = useSelector(selectRooms);
-  const messages = useSelector(selectCurrentRoomMessages);
+  const rooms = useSelector(selectGroups);
+  const messages = useSelector(selectCurrentGroupMessages);
   const onlineUsers = useSelector(selectOnlineUsers);
 
   const [filteredUsers, setFilteredUsers] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
-  const [filteredRooms, setFilteredRooms] = useState(null);
+  const [filteredGroups, setFilteredGroups] = useState(null);
 
   useEffect(() => {
     return () => {
@@ -46,21 +46,21 @@ export const People = () => {
   }, [currentUser, users, onlineUsers]);
 
   useEffect(() => {
-    setFilteredRooms(rooms.filter((room) => room.is_user));
+    setFilteredGroups(rooms.filter((room) => room.is_user));
   }, [rooms]);
 
   useEffect(() => {
     if (currentConversation) {
       dispatch(
         actionSocketMessageSend({
-          event: ROOM_JOIN,
+          event: GROUP_JOIN,
           data: { roomId: currentConversation._id, userId: currentUser._id },
         }),
       );
-    } else if (filteredRooms && filteredRooms.length) {
-      setCurrentConversation(filteredRooms[0]);
+    } else if (filteredGroups && filteredGroups.length) {
+      setCurrentConversation(filteredGroups[0]);
     }
-  }, [dispatch, currentConversation, filteredRooms, currentUser]);
+  }, [dispatch, currentConversation, filteredGroups, currentUser]);
 
   const handleSendMessage = useCallback(
     (message) =>
@@ -86,7 +86,7 @@ export const People = () => {
           rooms={filteredUsers}
           messages={messages}
           currentConversation={currentConversation}
-          handleChangeRoom={setCurrentConversation}
+          handleChangeGroup={setCurrentConversation}
           handleSendMessage={handleSendMessage}
         />
       ) : (

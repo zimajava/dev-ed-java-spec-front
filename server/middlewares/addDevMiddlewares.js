@@ -7,6 +7,7 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 function createWebpackMiddleware(compiler, publicPath) {
   return webpackDevMiddleware(compiler, {
     publicPath,
+    writeToDisk: true,
   });
 }
 

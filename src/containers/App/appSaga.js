@@ -1,8 +1,7 @@
 import { put, takeLatest, call, select, take, fork } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
-import io from 'socket.io-client';
 
-import { IO_BASE } from '../../config';
+import { WS_BASE } from '../../config';
 import { selectUserAuthData } from '../Auth/selectors';
 import { actionAppLogOut } from '../Auth/actions';
 import {
@@ -13,9 +12,10 @@ import {
   SOCKET_CLOSE,
   SOCKET_OPEN,
   USER_GET_SUCCESS,
-  MEMBERS_GET_SUCCESS,
-  CHANNELS_GET_SUCCESS,
+  USERS_GET_SUCCESS,
+  GROUPS_GET_SUCCESS,
   SOCKET_COMMANDS,
+  SOCKET_MESSAGE_RECEIVE,
 } from './constants';
 import {
   actionAppFinishInit,
@@ -25,26 +25,31 @@ import {
   actionSocketError,
   actionSocketMessageSend,
   actionUserGetSuccess,
-  actionMembersGetSuccess,
-  actionChannelsGetSuccess,
-  actionNewChannel,
-  actionMessagesGetSuccess,
-  actionMessageReceive,
-  actionMembersOnline,
+  actionUsersGetSuccess,
+  actionGroupsGetSuccess,
+  // actionNewGroup,
+  // actionMessagesGetSuccess,
+  // actionMessageReceive,
+  // actionUsersOnline,
+  actionSocketClose,
+  actionSocketMessageReceive,
+  // actionGroupMessagesGetSuccess,
+  // actionGroupMessageReceive,
+  // actionOnlineUsers,
 } from './actions';
 
 const {
-  MEMBER,
-  // MEMBER_EDIT,
-  MEMBERS,
-  MEMBERS_ONLINE,
-  CHANNEL_CREATE,
-  CHANNELS,
-  ROOM_JOIN,
-  // ROOM_LEAVE,
+  USER,
+  // USER_EDIT,
+  USERS,
+  // USERS_ONLINE,
+  // GROUP_CREATE,
+  GROUPS,
+  // GROUP_JOIN,
+  // GROUP_LEAVE,
   // EDITOR_TYPING,
   // EDITOR_STOP_TYPING,
-  MESSAGE_ADD,
+  // MESSAGE_ADD,
   // MESSAGE_EDIT,
   // MESSAGE_DELETE,
   // DISCONNECT,
@@ -64,35 +69,32 @@ function* handleSocketInit(action) {
   const { payload } = action;
 
   try {
-    const socket = io(IO_BASE, { query: { token: payload.token } });
-    socket.on();
+    const socket = new WebSocket(`${WS_BASE}?token=${payload.token}`);
     yield put(actionSocketConnect({ socket }));
   } catch (e) {
     console.error(e);
   }
 }
 
-function watchMessage(socket) {
+function watchMessage(payload) {
+  const { socket } = payload;
+
   return eventChannel((emitter) => {
-    socket.on('connect', (event) => emitter(actionSocketOpen(event)));
-    socket.on('error', (event) => emitter(actionSocketError(event)));
-    socket.on(MEMBER, (data) => {
-      if (!data) {
-        emitter(actionAppLogOut());
-      }
+    socket.onopen = (event) => emitter(actionSocketOpen(event));
+    socket.onclose = (event) => emitter(actionSocketClose(event));
+    socket.onerror = (event) => emitter(actionSocketError(event));
+    socket.onmessage = (event) => emitter(actionSocketMessageReceive(JSON.parse(event.data)));
 
-      emitter(actionUserGetSuccess({ data }));
-    });
-    socket.on(MEMBERS_ONLINE, (data) => emitter(actionMembersOnline({ data })));
-    socket.on(MEMBERS, (data) => emitter(actionMembersGetSuccess({ data })));
-    socket.on(CHANNELS, (data) => emitter(actionChannelsGetSuccess({ data })));
-    socket.on(ROOM_JOIN, (data) => emitter(actionMessagesGetSuccess({ data })));
-    socket.on(MESSAGE_ADD, (data) => emitter(actionMessageReceive({ data })));
-    socket.on(CHANNEL_CREATE, (data) => emitter(actionNewChannel({ data })));
+    // Returning a cleanup function, to be called if the saga completes or is cancelled
+    return () => socket.close();
 
-    return () => {
-      socket.close();
-    };
+    // socket.on(USER, (data) => {
+    //   if (!data) {
+    //     emitter(actionAppLogOut());
+    //   }
+    //
+    //   emitter(actionUserGetSuccess({ data }));
+    // });
   });
 }
 
@@ -100,8 +102,7 @@ function* internalListener(socket) {
   try {
     while (true) {
       const { payload } = yield take(SOCKET_MESSAGE_SEND);
-
-      socket.emit(payload.event, payload.data);
+      socket.send(JSON.stringify(payload));
     }
   } catch (e) {
     console.error(e);
@@ -142,14 +143,50 @@ function* handleGetInitialData() {
   try {
     const { userId } = yield select(selectUserAuthData);
 
-    yield put(actionSocketMessageSend({ event: MEMBER, data: { userId } }));
-    yield put(actionSocketMessageSend({ event: MEMBERS }));
-    yield put(actionSocketMessageSend({ event: CHANNELS }));
+    yield put(actionSocketMessageSend({ command: USER, data: { userId } }));
+    yield put(actionSocketMessageSend({ command: USERS }));
+    yield put(actionSocketMessageSend({ command: GROUPS }));
 
-    yield take([USER_GET_SUCCESS, MEMBERS_GET_SUCCESS, CHANNELS_GET_SUCCESS]);
+    yield take([USER_GET_SUCCESS, USERS_GET_SUCCESS, GROUPS_GET_SUCCESS]);
     yield put(actionAppFinishInit());
   } catch (e) {
     console.error(e);
+  }
+}
+
+function* receiveMessages(action) {
+  const {
+    payload: { command, data },
+  } = action;
+
+  switch (command) {
+    case 'currentUser': {
+      if (!data) {
+        yield put(actionAppLogOut());
+      }
+      yield put(actionUserGetSuccess({ data }));
+      break;
+    }
+    case 'users': {
+      yield put(actionUsersGetSuccess({ data }));
+      break;
+    }
+    case 'rooms': {
+      yield put(actionGroupsGetSuccess({ data }));
+      break;
+    }
+    // case 'roomMessagesById': {
+    //   yield put(actionGroupMessagesGetSuccess({ data }));
+    //   break;
+    // }
+    // case 'message': {
+    //   yield put(actionGroupMessageReceive({ data }));
+    //   break;
+    // }
+    // case 'onlineUsers': {
+    //   yield put(actionOnlineUsers({ data }));
+    //   break;
+    // }
   }
 }
 
@@ -158,4 +195,5 @@ export function* appSaga() {
   yield takeLatest(INIT_SOCKET, handleSocketInit);
   yield takeLatest(SOCKET_CONNECT, handleSocketManager);
   yield takeLatest(SOCKET_OPEN, handleGetInitialData);
+  yield takeLatest(SOCKET_MESSAGE_RECEIVE, receiveMessages);
 }

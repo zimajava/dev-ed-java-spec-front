@@ -6,30 +6,15 @@ module.exports = {
     },
     {
       path: '/channels',
-      name: 'Channels',
+      name: 'Groups',
     },
     {
       path: '/about',
       name: 'About',
     },
   ],
-  users: [
-    {
-      name: 'User1',
-      isOnline: true,
-    },
-    {
-      name: 'User2',
-      isOnline: false,
-    },
-    {
-      name: 'User3',
-      isOnline: true,
-    },
-  ],
-  // API_BASE: 'https://nestjs-chat-api.herokuapp.com',
-  API_BASE: 'http://localhost:3001',
-  // WS_BASE: 'ws://nestjs-chat-api.herokuapp.com',
-  WS_BASE: 'ws://localhost:3001',
-  IO_BASE: 'http://localhost:3001',
+  API_BASE: 'https://dev-ed-messenger-server-dev.herokuapp.com',
+  // API_BASE: 'http://localhost:8080',
+  WS_BASE: 'https://dev-ed-messenger-server-dev.herokuapp.com/ws',
+  // WS_BASE: 'http://localhost:8080/ws',
 };

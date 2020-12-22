@@ -9,7 +9,7 @@ import { RouteWithCheckAuth } from '../../router';
 import { useAuthBase } from '../../hooks';
 import { Menu } from '../../components';
 import { People } from '../People/People';
-import { Channels } from '../Channels/Channels';
+import { Groups } from '../Groups/Groups';
 import { About } from '../About/About';
 import { selectCurrentUser } from './selectors';
 import { actionAppLogOut } from '../Auth/actions';
@@ -53,7 +53,7 @@ export const App = () => {
             path="/channels"
             redirectPath="/sign-in"
             useAuthBase={useAuthBase}
-            component={Channels}
+            component={Groups}
           />
           <RouteWithCheckAuth
             exact

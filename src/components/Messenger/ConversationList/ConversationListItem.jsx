@@ -61,14 +61,14 @@ export function ConversationListItem(props) {
     name,
     snippet = '',
     isShowSnippet = true,
-    handleChangeRoom,
+    handleChangeGroup,
   } = props;
   const classes = useStyles();
 
   return (
     // <div
     //   className={clsx(classes.root, { [classes.isActive]: isActive })}
-    //   onClick={() => handleChangeRoom(conversation)}
+    //   onClick={() => handleChangeGroup(conversation)}
     // >
     //   <img className={classes.photo} src="photo" alt="conversation" />
     //   <div className={classes.info}>
@@ -79,7 +79,7 @@ export function ConversationListItem(props) {
     <ListItem
       className={clsx({ [classes.isActive]: isActive }, { [classes.snippetFake]: !snippet })}
       button
-      onClick={() => handleChangeRoom(conversation)}
+      onClick={() => handleChangeGroup(conversation)}
     >
       <ListItemIcon>
         <BadgeAvatar alt={name} isOnline={conversation.isOnline} />

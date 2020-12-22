@@ -12,9 +12,9 @@ export const selectReformattedUsers = createSelector(
   selectAppDomain,
   (app) => app.reformattedUsers,
 );
-export const selectCurrentRoomMessages = createSelector(
+export const selectCurrentGroupMessages = createSelector(
   selectAppDomain,
-  (app) => app.currentRoomMessages,
+  (app) => app.currentGroupMessages,
 );
-export const selectRooms = createSelector(selectAppDomain, (app) => app.rooms);
+export const selectGroups = createSelector(selectAppDomain, (app) => app.rooms);
 export const selectOnlineUsers = createSelector(selectAppDomain, (app) => app.onlineUsers);

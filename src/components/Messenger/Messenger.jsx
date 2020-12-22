@@ -39,10 +39,10 @@ export const Messenger = (props) => {
     currentConversation,
     isShowJoinButton = false,
     isCreateConversation,
-    handleChangeRoom,
+    handleChangeGroup,
     handleSendMessage,
-    handleSubscribeRoom,
-    handleCreateChannel,
+    handleSubscribeGroup,
+    handleCreateGroup,
   } = props;
   const classes = useStyles();
 
@@ -54,8 +54,8 @@ export const Messenger = (props) => {
           rooms={rooms}
           currentConversation={currentConversation}
           isCreateConversation={isCreateConversation}
-          handleChangeRoom={handleChangeRoom}
-          handleCreateChannel={handleCreateChannel}
+          handleChangeGroup={handleChangeGroup}
+          handleCreateGroup={handleCreateGroup}
         />
       </div>
       <div className={classes.content}>
@@ -64,7 +64,7 @@ export const Messenger = (props) => {
           messages={messages}
           isShowJoinButton={isShowJoinButton}
           handleSendMessage={handleSendMessage}
-          handleSubscribeRoom={handleSubscribeRoom}
+          handleSubscribeGroup={handleSubscribeGroup}
         />
       </div>
     </Box>
@@ -91,8 +91,8 @@ Messenger.propTypes = {
   currentConversation: PropTypes.object,
   isShowJoinButton: PropTypes.bool,
   isCreateConversation: PropTypes.bool,
-  handleChangeRoom: PropTypes.func,
+  handleChangeGroup: PropTypes.func,
   handleSendMessage: PropTypes.func,
-  handleSubscribeRoom: PropTypes.func,
-  handleCreateChannel: PropTypes.func,
+  handleSubscribeGroup: PropTypes.func,
+  handleCreateGroup: PropTypes.func,
 };

@@ -3,7 +3,7 @@ import { push } from 'connected-react-router';
 import axios from 'axios';
 
 import { API_BASE } from '../../config';
-import { USER_AUTH_REQUEST, USER_REGISTER_REQUEST } from './constants';
+import { USER_AUTH_REQUEST, USER_REGISTER_REQUEST, CONFIRM_MAIL_REQUEST } from './constants';
 import {
   actionUserIsAuthSet,
   // actionUserRegisterSuccess
@@ -12,7 +12,7 @@ import {
 function* handleAuth(action) {
   const { payload } = action;
 
-  const requestURL = `${API_BASE}/api/auth/login`;
+  const requestURL = `${API_BASE}/zipli/auth/signin`;
 
   try {
     const userAuthData = yield axios.post(requestURL, payload).then((response) => response.data);
@@ -26,7 +26,7 @@ function* handleAuth(action) {
 function* handleRegister(action) {
   const { payload } = action;
 
-  const requestURL = `${API_BASE}/api/auth/registration`;
+  const requestURL = `${API_BASE}/zipli/auth/signup`;
 
   try {
     yield axios.post(requestURL, payload).then((response) => response.data);
@@ -37,7 +37,25 @@ function* handleRegister(action) {
   }
 }
 
+function* handleConfirmMail(action) {
+  const { payload } = action;
+
+  const requestURL = `${API_BASE}/zipli/auth/confirm-account`;
+
+  try {
+    yield axios
+      .get(requestURL, { params: { token: payload.token } })
+      // eslint-disable-next-line no-console
+      .then((response) => console.log(response.data));
+
+    yield put(push('/sign-in'));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export function* authSaga() {
   yield takeLatest(USER_AUTH_REQUEST, handleAuth);
   yield takeLatest(USER_REGISTER_REQUEST, handleRegister);
+  yield takeLatest(CONFIRM_MAIL_REQUEST, handleConfirmMail);
 }

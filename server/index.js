@@ -1,16 +1,11 @@
 /* eslint consistent-return:0 import/order:0 */
 const { resolve } = require('path');
 const express = require('express');
-// const session = require('express-session');
 
 const logger = require('./logger');
 const argv = require('./argv');
 const port = require('./port');
 const setup = require('./middlewares/frontendMiddleware');
-// const myApi = require('./myApi');
-
-const isDev = process.env.NODE_ENV !== 'production';
-const ngrok = (isDev && process.env.ENABLE_TUNNEL) || argv.tunnel ? require('ngrok') : false;
 
 // get the intended host and port number, use localhost and port 3000 if not provided
 const customHost = argv.host || process.env.HOST;
@@ -19,21 +14,11 @@ const prettyHost = customHost || 'localhost';
 
 const app = express();
 
-// If you need a backend, e.g. an API, add your custom backend-specific middleware here
-// app.use(
-//   session({
-//     resave: false,
-//     saveUninitialized: true,
-//     secret: 'asdasdmaafamk34qwklT',
-//   }),
-// );
-// app.use('/api', myApi);
+// define the react-application here
+app.use(express.static(resolve(process.cwd(), 'build'))); // optionally one can add some route handler to protect this resource?
 
 // In production we need to pass these values in instead of relying on webpack
-setup(app, {
-  outputPath: resolve(process.cwd(), 'build'),
-  publicPath: '/',
-});
+setup(app, { outputPath: resolve(process.cwd(), 'build'), publicPath: '/' });
 
 // use the gzipped bundle
 app.get('*.js', (req, res, next) => {
@@ -48,16 +33,5 @@ app.listen(port, host, async (err) => {
     return logger.error(err.message);
   }
 
-  // Connect to ngrok in dev mode
-  if (ngrok) {
-    let url;
-    try {
-      url = await ngrok.connect(port);
-    } catch (e) {
-      return logger.error(e);
-    }
-    logger.appStarted(port, prettyHost, url);
-  } else {
-    logger.appStarted(port, prettyHost);
-  }
+  logger.appStarted(port, prettyHost);
 });

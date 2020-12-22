@@ -47,7 +47,7 @@ export const SignIn = () => {
   const onFormSubmit = (event) => {
     event.preventDefault();
 
-    dispatch(actionUserAuthRequest({ email, password }));
+    dispatch(actionUserAuthRequest({ login: email, password }));
   };
 
   return (
