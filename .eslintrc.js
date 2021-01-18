@@ -30,7 +30,7 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': [
-      'error',
+      'warn',
       {
         bracketSpacing: true,
         jsxBracketSameLine: false,
@@ -60,18 +60,13 @@ module.exports = {
       },
     ],
     'no-shadow': 'off',
-    'no-unused-expressions': 'error',
+    'no-unused-expressions': 'warn',
     'prefer-arrow-callback': 'off',
     'prefer-const': 'warn',
     'react/jsx-filename-extension': 'error',
     'react/jsx-no-target-blank': 'error',
     'react/button-has-type': 'off',
-    'react/prop-types': [
-      'warn',
-      {
-        ignore: ['children', 'className', 'style', 'disabled'],
-      },
-    ],
+    'react/prop-types': 'off',
     'react/no-unused-prop-types': 'warn',
     'react/prefer-stateless-function': 'error',
     'react/require-default-props': 'off',
@@ -90,8 +85,8 @@ module.exports = {
         functions: false,
       },
     ],
-    'import/no-extraneous-dependencies': 'warn',
-    'no-console': ['error', { allow: ['error'] }],
+    'import/no-extraneous-dependencies': 'off',
+    'no-console': 'warn',
     'redux-saga/no-unhandled-errors': 'warn',
     'import/no-cycle': 'warn',
     'no-bitwise': 'warn',
@@ -105,6 +100,8 @@ module.exports = {
         allowChildren: true,
       },
     ],
-    'react/jsx-props-no-spreading': ['warn', { html: 'ignore', exceptions: ['Component'] }],
+    'react/jsx-props-no-spreading': 'off',
+    'no-unused-vars': 'warn',
+    'no-debugger': 'warn',
   },
 };

@@ -9,7 +9,7 @@ export function storeCreator(options = {}) {
   const {
     reducer = undefined,
     middleware = [],
-    devTools = __DEV__,
+    devTools = process.env.NODE_ENV !== 'production',
     preloadedState = undefined,
     enhancers = undefined,
   } = options;
@@ -35,7 +35,7 @@ export function storeCreator(options = {}) {
     const { composeWithDevTools } = require('redux-devtools-extension');
     finalCompose = composeWithDevTools({
       // Enable capture of stack traces for dispatched Redux actions
-      trace: __DEV__,
+      trace: process.env.NODE_ENV !== 'production',
       ...(typeof devTools === 'object' && devTools),
     });
   }
