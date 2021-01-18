@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "prepare": "yarn run build",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build2": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "start:production": "yarn run build && yarn run start:prod",
-    "start:prod": "cross-env NODE_ENV=production node server",
+    "start:production": "cross-env NODE_ENV=production node server",
     "build:clean": "rimraf ./build",
     "lint": "eslint **/src/**/*.{js,jsx} --quiet",
     "lint:staged": "lint-staged"
