@@ -72,10 +72,10 @@ export function ConversationList(props) {
       <div className={classes.scrollable}>
         {rooms.map((conversation) => (
           <ConversationListItem
-            key={conversation._id}
-            isActive={conversation._id === currentConversation._id}
+            key={conversation.id}
+            isActive={conversation.id === currentConversation.id}
             conversation={conversation}
-            name={conversation.name}
+            name={conversation.chatName}
             snippet={conversation.snippet}
             handleChangeGroup={handleChangeGroup}
           />

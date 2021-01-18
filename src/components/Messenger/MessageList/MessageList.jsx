@@ -34,7 +34,7 @@ const renderMessages = (userId, messages) => {
     const previous = messages[i - 1];
     const current = messages[i];
     const next = messages[i + 1];
-    const isMine = current.sender._id === userId;
+    const isMine = current.sender.id === userId;
     const currentMoment = moment(new Date(current.timestamp).getTime());
     let prevBySameAuthor = false;
     let nextBySameAuthor = false;
@@ -45,7 +45,7 @@ const renderMessages = (userId, messages) => {
     if (previous) {
       const previousMoment = moment(new Date(previous.timestamp).getTime());
       const previousDuration = moment.duration(currentMoment.diff(previousMoment));
-      prevBySameAuthor = previous.sender._id === current.sender._id;
+      prevBySameAuthor = previous.sender.id === current.sender.id;
 
       if (prevBySameAuthor && previousDuration.as('hours') < 1) {
         startsSequence = false;
@@ -59,7 +59,7 @@ const renderMessages = (userId, messages) => {
     if (next) {
       const nextMoment = moment(new Date(next.timestamp).getTime());
       const nextDuration = moment.duration(nextMoment.diff(currentMoment));
-      nextBySameAuthor = next.sender._id === current.sender._id;
+      nextBySameAuthor = next.sender.id === current.sender.id;
 
       if (nextBySameAuthor && nextDuration.as('hours') < 1) {
         endsSequence = false;

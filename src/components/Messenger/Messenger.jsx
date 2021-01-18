@@ -76,9 +76,11 @@ Messenger.propTypes = {
   userId: PropTypes.string.isRequired,
   rooms: PropTypes.arrayOf(
     PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      chatName: PropTypes.string.isRequired,
+      creatorUserId: PropTypes.string.isRequired,
       isOnline: PropTypes.bool,
+      idUsers: PropTypes.arrayOf(PropTypes.string),
     }),
   ).isRequired,
   messages: PropTypes.arrayOf(

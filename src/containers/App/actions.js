@@ -16,6 +16,7 @@ import {
   SOCKET_ERROR,
   SOCKET_MESSAGE_SEND,
   SOCKET_MESSAGE_RECEIVE,
+  MESSAGE_RECEIVE,
 } from './constants';
 
 export const actionAppStartInit = () => ({ type: APP_START_INIT });
@@ -33,6 +34,8 @@ export const actionGroupsGetSuccess = (payload) => ({ type: GROUPS_GET_SUCCESS, 
 export const actionNewGroup = (payload) => ({ type: GROUP_NEW_SUCCESS, payload });
 export const actionMessagesGetSuccess = (payload) => ({ type: MESSAGES_GET_SUCCESS, payload });
 export const actionUsersOnline = (payload) => ({ type: ONLINE_USERS, payload });
+
+export const actionMessageReceive = (payload) => ({ type: MESSAGE_RECEIVE, payload });
 
 // Socket life circle
 export const actionInitSocket = (payload) => ({ type: INIT_SOCKET, payload });

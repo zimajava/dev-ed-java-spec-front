@@ -12,7 +12,7 @@ export const AuthRoot = () => {
       <AuthRoute
         exact
         path="/sign-up"
-        redirectPath="/people"
+        redirectPath="/conversations"
         useAuthBase={useAuthBase}
         actionAppStartInit={actionAppStartInit}
         component={SignUp}
@@ -20,7 +20,7 @@ export const AuthRoot = () => {
       <AuthRoute
         exact
         path="/sign-in"
-        redirectPath="/people"
+        redirectPath="/conversations"
         useAuthBase={useAuthBase}
         actionAppStartInit={actionAppStartInit}
         component={SignIn}

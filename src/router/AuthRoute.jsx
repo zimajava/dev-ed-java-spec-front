@@ -8,7 +8,7 @@ import { RenderComponent } from './RenderComponent';
 
 export const AuthRoute = (props) => {
   const {
-    redirectPath = '/people',
+    redirectPath = '/conversations',
     redirectOnLoggedIn = true,
     component,
     useAuthBase,

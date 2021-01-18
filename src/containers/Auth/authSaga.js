@@ -17,6 +17,8 @@ function* handleAuth(action) {
   try {
     const userAuthData = yield axios.post(requestURL, payload).then((response) => response.data);
 
+    window.sessionStorage.setItem('userAuthData', JSON.stringify(userAuthData));
+
     yield put(actionUserIsAuthSet({ isAuth: true, userAuthData }));
   } catch (e) {
     console.error(e);
@@ -40,11 +42,11 @@ function* handleRegister(action) {
 function* handleConfirmMail(action) {
   const { payload } = action;
 
-  const requestURL = `${API_BASE}/zipli/auth/confirm-account`;
+  const requestURL = `${API_BASE}/zipli/auth/confirm-mail?token=${payload.token}`;
 
   try {
     yield axios
-      .get(requestURL, { params: { token: payload.token } })
+      .post(requestURL, { token: payload.token })
       // eslint-disable-next-line no-console
       .then((response) => console.log(response.data));
 

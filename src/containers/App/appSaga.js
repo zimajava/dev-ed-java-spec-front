@@ -1,7 +1,8 @@
 import { put, takeLatest, call, select, take, fork } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 
-import { WS_BASE } from '../../config';
+import axios from 'axios';
+import { API_BASE, WS_BASE } from '../../config';
 import { selectUserAuthData } from '../Auth/selectors';
 import { actionAppLogOut } from '../Auth/actions';
 import {
@@ -11,8 +12,8 @@ import {
   SOCKET_MESSAGE_SEND,
   SOCKET_CLOSE,
   SOCKET_OPEN,
-  USER_GET_SUCCESS,
-  USERS_GET_SUCCESS,
+  // USER_GET_SUCCESS,
+  // USERS_GET_SUCCESS,
   GROUPS_GET_SUCCESS,
   SOCKET_COMMANDS,
   SOCKET_MESSAGE_RECEIVE,
@@ -33,33 +34,66 @@ import {
   // actionUsersOnline,
   actionSocketClose,
   actionSocketMessageReceive,
+  actionMessageReceive,
   // actionGroupMessagesGetSuccess,
   // actionGroupMessageReceive,
   // actionOnlineUsers,
 } from './actions';
 
 const {
-  USER,
-  // USER_EDIT,
-  USERS,
-  // USERS_ONLINE,
-  // GROUP_CREATE,
-  GROUPS,
-  // GROUP_JOIN,
-  // GROUP_LEAVE,
-  // EDITOR_TYPING,
-  // EDITOR_STOP_TYPING,
-  // MESSAGE_ADD,
-  // MESSAGE_EDIT,
-  // MESSAGE_DELETE,
-  // DISCONNECT,
+  CHAT_GROUP_CREATE,
+  CHAT_PRIVATE_CREATE,
+  CHAT_UPDATE,
+  CHAT_DELETE,
+  CHAT_LEAVE,
+  CHAT_JOIN,
+  CHATS_GET_BY_USER_ID,
+  MESSAGE_SEND,
+  MESSAGE_UPDATE,
+  MESSAGE_DELETE,
+  MESSAGES_GET_BY_CHAT_ID,
+  VIDEO_CALL_START,
+  VIDEO_CALL_JOIN,
+  VIDEO_CALL_EXIT,
 } = SOCKET_COMMANDS;
+
+function* handleGetCurrentUser() {
+  try {
+    const { userId, accessToken } = yield select(selectUserAuthData);
+
+    const requestURL = `${API_BASE}/zipli/myAccount/getUser`;
+
+    const allUsers = yield axios
+      .get(requestURL, { params: { userId, token: accessToken } })
+      .then((response) => response.data);
+
+    yield put(actionSocketMessageReceive({ command: 'currentUser', data: allUsers }));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function* handleGetAllUsers() {
+  try {
+    const { accessToken } = yield select(selectUserAuthData);
+
+    const requestURL = `${API_BASE}/zipli/сhat/getAllUsers`;
+
+    const currentUser = yield axios
+      .get(requestURL, { params: { token: accessToken } })
+      .then((response) => response.data);
+
+    yield put(actionSocketMessageReceive({ command: 'users', data: currentUser }));
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 function* handleAppStartInit() {
   try {
-    const { tokens } = yield select(selectUserAuthData);
+    const { accessToken } = yield select(selectUserAuthData);
 
-    yield put(actionInitSocket({ token: tokens.accessToken }));
+    yield put(actionInitSocket({ token: accessToken }));
   } catch (e) {
     console.error(e);
   }
@@ -98,7 +132,7 @@ function watchMessage(payload) {
   });
 }
 
-function* internalListener(socket) {
+function* internalListener({ socket }) {
   try {
     while (true) {
       const { payload } = yield take(SOCKET_MESSAGE_SEND);
@@ -124,10 +158,10 @@ function* handleSocketManager(action) {
   const { payload } = action;
 
   try {
-    const socketChannel = yield call(watchMessage, payload.socket);
+    const socketChannel = yield call(watchMessage, payload);
 
     yield fork(externalListener, socketChannel);
-    yield fork(internalListener, payload.socket);
+    yield fork(internalListener, payload);
 
     const cancel = yield take(SOCKET_CLOSE);
 
@@ -143,11 +177,16 @@ function* handleGetInitialData() {
   try {
     const { userId } = yield select(selectUserAuthData);
 
-    yield put(actionSocketMessageSend({ command: USER, data: { userId } }));
-    yield put(actionSocketMessageSend({ command: USERS }));
-    yield put(actionSocketMessageSend({ command: GROUPS }));
+    yield call(handleGetCurrentUser);
+    yield call(handleGetAllUsers);
+    yield put(
+      actionSocketMessageSend({
+        command: CHATS_GET_BY_USER_ID,
+        data: { chatName: '', secondUserId: '', idUser: userId, idChat: '' },
+      }),
+    );
 
-    yield take([USER_GET_SUCCESS, USERS_GET_SUCCESS, GROUPS_GET_SUCCESS]);
+    yield take([GROUPS_GET_SUCCESS]);
     yield put(actionAppFinishInit());
   } catch (e) {
     console.error(e);
@@ -156,37 +195,35 @@ function* handleGetInitialData() {
 
 function* receiveMessages(action) {
   const {
-    payload: { command, data },
+    payload: { command, data, message },
   } = action;
 
-  switch (command) {
-    case 'currentUser': {
-      if (!data) {
-        yield put(actionAppLogOut());
+  try {
+    switch (command) {
+      case 'currentUser': {
+        if (!data) {
+          yield put(actionAppLogOut());
+        }
+        yield put(actionUserGetSuccess({ data }));
+        break;
       }
-      yield put(actionUserGetSuccess({ data }));
-      break;
+      case 'users': {
+        yield put(actionUsersGetSuccess({ data }));
+        break;
+      }
+      case CHATS_GET_BY_USER_ID: {
+        yield put(actionGroupsGetSuccess({ data: message }));
+        break;
+      }
+      case MESSAGE_SEND: {
+        if (Array.isArray(message)) {
+          yield put(actionMessageReceive({ data: message }));
+        }
+        break;
+      }
     }
-    case 'users': {
-      yield put(actionUsersGetSuccess({ data }));
-      break;
-    }
-    case 'rooms': {
-      yield put(actionGroupsGetSuccess({ data }));
-      break;
-    }
-    // case 'roomMessagesById': {
-    //   yield put(actionGroupMessagesGetSuccess({ data }));
-    //   break;
-    // }
-    // case 'message': {
-    //   yield put(actionGroupMessageReceive({ data }));
-    //   break;
-    // }
-    // case 'onlineUsers': {
-    //   yield put(actionOnlineUsers({ data }));
-    //   break;
-    // }
+  } catch (e) {
+    console.error(e);
   }
 }
 

@@ -35,5 +35,5 @@ RouteWithCheckAuth.propTypes = {
   redirectPath: PropTypes.string,
   exact: PropTypes.bool,
   useAuthBase: PropTypes.func.isRequired,
-  component: PropTypes.element.isRequired,
+  component: PropTypes.oneOfType([PropTypes.func, PropTypes.node, PropTypes.element]).isRequired,
 };

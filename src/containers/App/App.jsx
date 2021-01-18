@@ -8,63 +8,44 @@ import { useSessionStorage } from 'react-use';
 import { RouteWithCheckAuth } from '../../router';
 import { useAuthBase } from '../../hooks';
 import { Menu } from '../../components';
-import { People } from '../People/People';
-import { Groups } from '../Groups/Groups';
-import { About } from '../About/About';
+import { Conversations } from '../Conversations/Conversations';
 import { selectCurrentUser } from './selectors';
 import { actionAppLogOut } from '../Auth/actions';
-import { selectIsLogOut, selectUserAuthData } from '../Auth/selectors';
+import { selectIsLogOut } from '../Auth/selectors';
 
 export const App = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser, shallowEqual);
-  const userAuthData = useSelector(selectUserAuthData);
 
-  const [value, setValue] = useSessionStorage('userAuthData');
+  const [, setValue] = useSessionStorage('userAuthData');
   const isLogOut = useSelector(selectIsLogOut);
 
   useEffect(() => {
     if (isLogOut) {
       dispatch(push('/sign-in'));
-    } else if (!value && !isLogOut) {
-      setValue(() => userAuthData);
     }
-  }, [dispatch, isLogOut, setValue, userAuthData, value]);
+  }, [dispatch, isLogOut]);
 
   return (
     <Box>
       <Menu
-        title={currentUser.name}
+        title={currentUser.userName}
+        avatarSrc={currentUser.avatar}
         handleLogOut={() => {
           setValue(() => undefined);
           dispatch(actionAppLogOut());
         }}
-      >
-        <Switch>
-          <RouteWithCheckAuth
-            exact
-            path="/people"
-            redirectPath="/sign-in"
-            useAuthBase={useAuthBase}
-            component={People}
-          />
-          <RouteWithCheckAuth
-            exact
-            path="/channels"
-            redirectPath="/sign-in"
-            useAuthBase={useAuthBase}
-            component={Groups}
-          />
-          <RouteWithCheckAuth
-            exact
-            path="/about"
-            redirectPath="/sign-in"
-            useAuthBase={useAuthBase}
-            component={About}
-          />
-          <Route component={() => <Redirect to={{ pathname: '/people' }} />} />
-        </Switch>
-      </Menu>
+      />
+      <Switch>
+        <RouteWithCheckAuth
+          exact
+          path="/conversations"
+          redirectPath="/sign-in"
+          useAuthBase={useAuthBase}
+          component={Conversations}
+        />
+        <Route component={() => <Redirect to={{ pathname: '/conversations' }} />} />
+      </Switch>
     </Box>
   );
 };

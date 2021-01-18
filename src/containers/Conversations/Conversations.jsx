@@ -7,16 +7,16 @@ import { Messenger } from '../../components';
 import { actionSocketMessageSend } from '../App/actions';
 import { SOCKET_COMMANDS } from '../App/constants';
 
-const { GROUP_JOIN, MESSAGE_ADD, GROUP_CREATE } = SOCKET_COMMANDS;
+const { CHAT_GROUP_CREATE, MESSAGE_SEND, CHAT_JOIN } = SOCKET_COMMANDS;
 
-export const Groups = () => {
+export function Conversations(props) {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
 
   const rooms = useSelector(selectGroups);
   const messages = useSelector(selectCurrentGroupMessages);
 
-  const [currentConversation, setCurrentConversation] = useState(null);
+  const [currentConversation, setCurrentConversation] = useState({});
 
   useEffect(() => {
     return () => {
@@ -25,15 +25,15 @@ export const Groups = () => {
   }, []);
 
   useEffect(() => {
-    if (currentConversation) {
+    if (currentConversation.length) {
       dispatch(
         actionSocketMessageSend({
-          event: GROUP_JOIN,
-          data: { roomId: currentConversation._id, userId: currentUser._id },
+          command: CHAT_JOIN,
+          data: { roomId: currentConversation.id, userId: currentUser.id },
         }),
       );
     } else if (rooms && rooms.length && Object.keys(currentUser).length) {
-      setCurrentConversation(rooms.find((room) => room._id === currentUser.room._id) || rooms[0]);
+      setCurrentConversation(rooms.find((room) => room.id === currentUser.id) || rooms[0]);
     }
   }, [dispatch, currentConversation, currentUser, rooms]);
 
@@ -41,19 +41,29 @@ export const Groups = () => {
     (message) => {
       dispatch(
         actionSocketMessageSend({
-          event: MESSAGE_ADD,
-          data: { text: message, timestamp: new Date() },
+          command: MESSAGE_SEND,
+          data: {
+            messageId: '',
+            textMessage: message,
+            idUser: currentUser.id,
+            idChat: currentConversation.id,
+          },
         }),
       );
     },
-    [dispatch],
+    [currentConversation, currentUser.id, dispatch],
   );
   const handleCreateGroup = useCallback(
-    ({ name, description }) => {
+    ({ name }) => {
       dispatch(
         actionSocketMessageSend({
-          event: GROUP_CREATE,
-          data: { name, description },
+          command: CHAT_GROUP_CREATE,
+          data: {
+            chatName: name,
+            groupUsersIds: '',
+            idUser: currentUser.id,
+            idChat: '',
+          },
         }),
       );
     },
@@ -67,7 +77,7 @@ export const Groups = () => {
         <Messenger
           title="Groups"
           isCreateConversation
-          userId={currentUser._id}
+          userId={currentUser.id}
           rooms={rooms}
           messages={messages}
           currentConversation={currentConversation}
@@ -81,4 +91,7 @@ export const Groups = () => {
       )}
     </Box>
   );
-};
+}
+
+Conversations.propTypes = {};
+Conversations.defaultProps = {};
